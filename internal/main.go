@@ -24,12 +24,12 @@ func main() {
 				return err
 			}
 
-			var doc2 openapi2.Swagger
+			var doc2 openapi2.T
 			if err = json.Unmarshal(buf, &doc2); err != nil {
 				return err
 			}
 
-			doc3, err := openapi2conv.ToV3Swagger(&doc2)
+			doc3, err := openapi2conv.ToV3(&doc2)
 			if err != nil {
 				return err
 			}
@@ -60,7 +60,7 @@ func main() {
 				return err
 			}
 
-			var doc3 openapi3.Swagger
+			var doc3 openapi3.T
 			if err = json.Unmarshal(buf, &doc3); err != nil {
 				return err
 			}
