@@ -14,9 +14,12 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+def specsConvertedToV3DirName = "selling-partner-api-models-specs-v3"
+def specsConvertedToV3Path = "./internal/" + specsConvertedToV3DirName
+
 func main() {
 
-	if err := filepath.Walk("./internal/selling-partner-api-models/models", func(filePath string, info os.FileInfo, err error) error {
+	if err := filepath.Walk("./internal/selling-partner-api-models", func(filePath string, info os.FileInfo, err error) error {
 		if filepath.Ext(filePath) == ".json" {
 
 			buf, err := ioutil.ReadFile(filePath)
@@ -40,7 +43,7 @@ func main() {
 			}
 
 			filename := path.Base(filePath)
-			err = ioutil.WriteFile(filepath.Join("./internal/selling-partner-api-models-temp", filename), outBuf, os.ModePerm)
+			err = ioutil.WriteFile(filepath.Join(specsConvertedToV3Path, filename), outBuf, os.ModePerm)
 			if err != nil {
 				return err
 			}
@@ -52,7 +55,7 @@ func main() {
 
 	cmdStr := ""
 
-	if err := filepath.Walk("./internal/selling-partner-api-models-temp", func(filePath string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(specsConvertedToV3Path, func(filePath string, info os.FileInfo, err error) error {
 		if filepath.Ext(filePath) == ".json" {
 
 			buf, err := ioutil.ReadFile(filePath)
