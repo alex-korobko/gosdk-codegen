@@ -2,24 +2,34 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/getkin/kin-openapi/openapi2"
+	"github.com/getkin/kin-openapi/openapi2conv"
+	"github.com/getkin/kin-openapi/openapi3"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
-
-	"github.com/getkin/kin-openapi/openapi2"
-	"github.com/getkin/kin-openapi/openapi2conv"
-	"github.com/getkin/kin-openapi/openapi3"
+	"regexp"
 )
 
-def specsConvertedToV3DirName = "selling-partner-api-models-specs-v3"
-def specsConvertedToV3Path = "./internal/" + specsConvertedToV3DirName
-
 func main() {
-
-	if err := filepath.Walk("./internal/selling-partner-api-models", func(filePath string, info os.FileInfo, err error) error {
+	specsConvertedToV3DirName := "selling-partner-api-models-specs-v3"
+	specsConvertedToV3Path := "./internal/" + specsConvertedToV3DirName
+	versionNumberRegex, err := regexp.Compile("(([^/]+)V[0-9]+).json")
+	if err != nil {
+		panic(err)
+	}
+	versionDateRegex, err := regexp.Compile("(([^/]+)_[0-9]{4}-[0-9]{2}-[0-9]{2}).json")
+	if err != nil {
+		panic(err)
+	}
+	noVersionRegex, err := regexp.Compile("([^/]+).json")
+	if err != nil {
+		panic(err)
+	}
+	if err = filepath.Walk("./internal/selling-partner-api-models/models", func(filePath string, info os.FileInfo, err error) error {
 		if filepath.Ext(filePath) == ".json" {
 
 			buf, err := ioutil.ReadFile(filePath)
@@ -69,7 +79,7 @@ func main() {
 			}
 
 			packageName := ""
-
+			versionedPath := ""
 			if len(doc3.Paths) > 0 {
 				for _, item := range doc3.Paths {
 					if item.Get != nil && len(item.Get.Tags) > 0 {
@@ -82,12 +92,33 @@ func main() {
 					}
 				}
 				if packageName == "" {
-					packageName = strings.Replace(strings.Replace(path.Base(filePath), "V0.json", "", -1), "V0", "", -1)
+					//if packageName was not fetched from JSON, fetch it from file name
+					foundMatches := versionNumberRegex.FindStringSubmatch(filePath)
+					if foundMatches == nil {
+						foundMatches = versionDateRegex.FindStringSubmatch(filePath)
+					}
+					if foundMatches == nil {
+						foundMatches = noVersionRegex.FindStringSubmatch(filePath)
+					}
+					if foundMatches == nil {
+						panic(errors.New("Failed to fetch version and package name for the file path " + filePath))
+					}
+					if len(foundMatches) == 2 {
+						packageName = foundMatches[1]
+						versionedPath = foundMatches[1]
+					} else if len(foundMatches) > 2 {
+						packageName = foundMatches[2]
+						versionedPath = foundMatches[1]
+					} else {
+						panic(errors.New(fmt.Sprint("Too many matches ", foundMatches)))
+					}
+				} else {
+					versionedPath = packageName
 				}
 			}
 
-			cmdStr += fmt.Sprintf("mkdir -p ./selling-partner-api-go-sdk/%s/ & gosdk-codegen -generate types --package=%s -o ./selling-partner-api-go-sdk/%s/types.gen.go ./selling-partner-api-models-temp/%s \n", packageName, packageName, packageName, path.Base(filePath))
-			cmdStr += fmt.Sprintf("mkdir -p ./selling-partner-api-go-sdk/%s/ & gosdk-codegen -generate client --package=%s -o ./selling-partner-api-go-sdk/%s/api.gen.go ./selling-partner-api-models-temp/%s \n", packageName, packageName, packageName, path.Base(filePath))
+			cmdStr += fmt.Sprintf("mkdir -p ./selling-partner-api-go-sdk/%s/ & gosdk-codegen -generate types --package=%s -o ./selling-partner-api-go-sdk/%s/types.gen.go ./%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
+			cmdStr += fmt.Sprintf("mkdir -p ./selling-partner-api-go-sdk/%s/ & gosdk-codegen -generate client --package=%s -o ./selling-partner-api-go-sdk/%s/api.gen.go ./%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
 
 		}
 		return nil
