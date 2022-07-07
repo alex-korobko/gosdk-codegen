@@ -91,34 +91,34 @@ func main() {
 						break
 					}
 				}
-				if packageName == "" {
-					//if packageName was not fetched from JSON, fetch it from file name
-					foundMatches := versionNumberRegex.FindStringSubmatch(filePath)
-					if foundMatches == nil {
-						foundMatches = versionDateRegex.FindStringSubmatch(filePath)
-					}
-					if foundMatches == nil {
-						foundMatches = noVersionRegex.FindStringSubmatch(filePath)
-					}
-					if foundMatches == nil {
-						panic(errors.New("Failed to fetch version and package name for the file path " + filePath))
-					}
-					if len(foundMatches) == 2 {
+				versionedPath = packageName
+				foundMatches := versionNumberRegex.FindStringSubmatch(filePath)
+				if foundMatches == nil {
+					foundMatches = versionDateRegex.FindStringSubmatch(filePath)
+				}
+				if foundMatches == nil {
+					foundMatches = noVersionRegex.FindStringSubmatch(filePath)
+				}
+				if foundMatches == nil {
+					panic(errors.New("Failed to fetch version and package name for the file path " + filePath))
+				}
+				if len(foundMatches) == 2 {
+					if len(packageName) == 0 {
 						packageName = foundMatches[1]
-						versionedPath = foundMatches[1]
-					} else if len(foundMatches) > 2 {
-						packageName = foundMatches[2]
-						versionedPath = foundMatches[1]
-					} else {
-						panic(errors.New(fmt.Sprint("Too many matches ", foundMatches)))
 					}
+					versionedPath = foundMatches[1]
+				} else if len(foundMatches) > 2 {
+					if len(packageName) == 0 {
+						packageName = foundMatches[2]
+					}
+					versionedPath = foundMatches[1]
 				} else {
-					versionedPath = packageName
+					panic(errors.New(fmt.Sprint("Too many matches ", foundMatches)))
 				}
 			}
 
-			cmdStr += fmt.Sprintf("mkdir -p ./selling-partner-api-go-sdk/%s/ & gosdk-codegen -generate types --package=%s -o ./selling-partner-api-go-sdk/%s/types.gen.go ./%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
-			cmdStr += fmt.Sprintf("mkdir -p ./selling-partner-api-go-sdk/%s/ & gosdk-codegen -generate client --package=%s -o ./selling-partner-api-go-sdk/%s/api.gen.go ./%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
+			cmdStr += fmt.Sprintf("mkdir -p ./amzn/selling-partner-api-go-sdk/%s/ & ./gosdk-codegen -generate types --package=%s -o amzn/selling-partner-api-go-sdk/%s/types.gen.go internal/%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
+			cmdStr += fmt.Sprintf("mkdir -p ./amzn/selling-partner-api-go-sdk/%s/ & ./gosdk-codegen -generate client --package=%s -o amzn/selling-partner-api-go-sdk/%s/api.gen.go internal/%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
 
 		}
 		return nil
@@ -128,5 +128,5 @@ func main() {
 
 	fmt.Println(cmdStr)
 
-	_ = ioutil.WriteFile("./internal/gencode.sh", []byte(cmdStr), os.ModePerm)
+	_ = ioutil.WriteFile("./gencode.sh", []byte(cmdStr), os.ModePerm)
 }
