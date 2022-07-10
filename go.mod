@@ -1,4 +1,4 @@
-module gosdk-codegen
+module github.com/alex-korobko/gosdk-codegen
 
 go 1.15
 

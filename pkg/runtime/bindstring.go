@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	"gosdk-codegen/pkg/types"
+	"github.com/alex-korobko/gosdk-codegen/pkg/types"
 )
 
 // This function takes a string, and attempts to assign it to the destination

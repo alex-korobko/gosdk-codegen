@@ -18,7 +18,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"gosdk-codegen/pkg/codegen/templates"
+	"github.com/alex-korobko/gosdk-codegen/pkg/codegen/templates"
 	"sort"
 	"strings"
 	"text/template"

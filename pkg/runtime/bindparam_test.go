@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"gosdk-codegen/pkg/types"
+	"github.com/alex-korobko/gosdk-codegen/pkg/types"
 )
 
 func TestSplitParameter(t *testing.T) {

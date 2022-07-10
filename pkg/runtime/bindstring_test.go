@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"gosdk-codegen/pkg/types"
+	"github.com/alex-korobko/gosdk-codegen/pkg/types"
 )
 
 func TestBindStringToObject(t *testing.T) {

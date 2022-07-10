@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gosdk-codegen/pkg/codegen"
-	"gosdk-codegen/pkg/util"
+	"github.com/alex-korobko/gosdk-codegen/pkg/codegen"
+	"github.com/alex-korobko/gosdk-codegen/pkg/util"
 	"io/ioutil"
 	"os"
 	"path/filepath"
