@@ -117,8 +117,8 @@ func main() {
 				}
 			}
 
-			cmdStr += fmt.Sprintf("mkdir -p ./amzn/selling-partner-api-go-sdk/%s/ & ./gosdk-codegen -generate types --package=%s -o amzn/selling-partner-api-go-sdk/%s/types.gen.go internal/%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
-			cmdStr += fmt.Sprintf("mkdir -p ./amzn/selling-partner-api-go-sdk/%s/ & ./gosdk-codegen -generate client --package=%s -o amzn/selling-partner-api-go-sdk/%s/api.gen.go internal/%s/%s \n", versionedPath, packageName, versionedPath, specsConvertedToV3DirName, path.Base(filePath))
+			cmdStr += fmt.Sprintf("mkdir -p ./amzn/selling-partner-api-go-sdk/%s/%s/ & ./gosdk-codegen -generate types --package=%s -o amzn/selling-partner-api-go-sdk/%s/%s/types.gen.go internal/%s/%s \n", versionedPath, packageName, packageName, versionedPath, packageName, specsConvertedToV3DirName, path.Base(filePath))
+			cmdStr += fmt.Sprintf("mkdir -p ./amzn/selling-partner-api-go-sdk/%s/%s/ & ./gosdk-codegen -generate client --package=%s -o amzn/selling-partner-api-go-sdk/%s/%s/api.gen.go internal/%s/%s \n", versionedPath, packageName, packageName, versionedPath, packageName, specsConvertedToV3DirName, path.Base(filePath))
 
 		}
 		return nil
